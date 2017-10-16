@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">RBuzz</string>
+    <string name="btnPlayBuzz">Tap for vibration</string>
+    <string name="btnRecordBuzz">Tap to record vibration pattern</string>
+</resources>
