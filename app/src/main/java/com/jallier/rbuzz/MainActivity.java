@@ -1,6 +1,7 @@
 package com.jallier.rbuzz;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -25,6 +26,15 @@ public class MainActivity extends AppCompatActivity {
 
         // Log the firebase token
         Log.d(TAG, "Firebase token: " + FirebaseInstanceId.getInstance().getToken());
+
+        final Button btnLoginActiv = (Button) findViewById(R.id.btnLoginActiv);
+        btnLoginActiv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(intent);
+            }
+        });
 
         // Get vibration api class
         final Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
