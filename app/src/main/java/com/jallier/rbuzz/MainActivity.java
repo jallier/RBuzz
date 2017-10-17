@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
                     pt[i] = pattern.get(i);
                 }
                 vibrator.vibrate(pt, -1);
-//                resetPattern(pattern); Add this in once done testing
+                resetPatternAndVars(pattern, initialBtnPush);
             }
         });
 
@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         btnReset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                resetPattern(pattern);
+                resetPatternAndVars(pattern, initialBtnPush);
                 initialBtnPush.setBool(true);
                 vibrator.cancel();
                 Log.d(TAG, "Pattern cleared");
@@ -83,9 +83,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void resetPattern(ArrayList<Long> pattern) {
+    private void resetPatternAndVars(ArrayList<Long> pattern, SimpleBool initialBtnPush) {
         pattern.clear();
         pattern.add((long) 0);
+        initialBtnPush.setBool(true);
     }
 
     private class SimpleBool {
