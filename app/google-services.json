@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "630374645419",
+    "firebase_url": "https://rbuzz-c9ce9.firebaseio.com",
+    "project_id": "rbuzz-c9ce9",
+    "storage_bucket": "rbuzz-c9ce9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:630374645419:android:cd7a8282a53ca4ec",
+        "android_client_info": {
+          "package_name": "com.jallier.rbuzz"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "630374645419-d7gcf6r3a3g8k8ljo4pmtqt3re19u5fl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jallier.rbuzz",
+            "certificate_hash": "161cb9f8920af6262cfa4ee3479014ccedb12b2c"
+          }
+        },
+        {
+          "client_id": "630374645419-2790o0bj1t62eon0elj9o1dqlhi1v0v7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDpvUV8IxgIb9_c4fYRJYbuxMSdnv69s0o"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "630374645419-2790o0bj1t62eon0elj9o1dqlhi1v0v7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

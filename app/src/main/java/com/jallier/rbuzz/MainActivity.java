@@ -9,6 +9,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 
+import com.google.firebase.iid.FirebaseInstanceId;
+
 import java.util.ArrayList;
 
 
@@ -20,6 +22,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Log the firebase token
+        Log.d(TAG, "Firebase token: " + FirebaseInstanceId.getInstance().getToken());
 
         // Get vibration api class
         final Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
