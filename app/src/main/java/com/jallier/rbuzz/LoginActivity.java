@@ -1,6 +1,7 @@
 package com.jallier.rbuzz;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -39,7 +40,12 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null) {
             Log.d(TAG, currentUser.getDisplayName());
+            Log.d(TAG, currentUser.getUid());
         }
+    }
+
+    private void returnUserData(){
+
     }
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
@@ -123,6 +129,15 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             Log.d(TAG, "" + acct.getEmail());
             Log.d(TAG, "" + acct.getId());
             Log.d(TAG, "" + acct.getIdToken());
+
+            // Send the info back to the parent activity
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("displayName", acct.getDisplayName());
+            resultIntent.putExtra("email", acct.getEmail());
+            resultIntent.putExtra("id", acct.getId());
+            resultIntent.putExtra("idToken", acct.getIdToken());
+            setResult(Activity.RESULT_OK, resultIntent);
+            finish();
         }
     }
 

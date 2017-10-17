@@ -1,5 +1,6 @@
 package com.jallier.rbuzz;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Vibrator;
@@ -18,21 +19,28 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private final long TIME_WINDOW = 5000; // ms for how long to check times between btn pushes
+    private final int LOGIN_ACTIVITY_CODE = 101;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Log the firebase token. Use this as the 'to:' id token
+        Log.d(TAG, "Firebase token: " + FirebaseInstanceId.getInstance().getToken());
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Log the firebase token
-        Log.d(TAG, "Firebase token: " + FirebaseInstanceId.getInstance().getToken());
 
         final Button btnLoginActiv = (Button) findViewById(R.id.btnLoginActiv);
         btnLoginActiv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(intent);
+//                startActivity(intent);
+                startActivityForResult(intent, LOGIN_ACTIVITY_CODE);
             }
         });
 
@@ -96,6 +104,17 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "Pattern cleared");
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case (LOGIN_ACTIVITY_CODE):
+                if (resultCode == Activity.RESULT_OK) {
+                    Log.d(TAG, data.getStringExtra("displayName"));
+                }
+        }
     }
 
     private void resetPatternAndVars(ArrayList<Long> pattern, SimpleBool initialBtnPush) {
