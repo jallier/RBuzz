@@ -32,9 +32,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 
-import java.util.Queue;
-import java.util.Stack;
-
 /**
  * A login screen that offers login via email/password.
  */
@@ -51,7 +48,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         super.onStart();
         //Firebase DB nonsense
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        mUsersReference = mDatabase.child("users");
+        mUsersReference = mDatabase.child("users").child(mAuth.getCurrentUser().getUid());
         ValueEventListener listener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -60,18 +57,19 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                Log.d(TAG, "Firebase connection error: " + databaseError.getDetails() + " " + databaseError.getMessage());
             }
         };
-        mUsersReference.addValueEventListener(listener);
+//        mUsersReference.addValueEventListener(listener);
+        mUsersReference.addListenerForSingleValueEvent(listener);
         mListener = listener;
 
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser != null) {
+        if (currentUser != null) {
             Log.d(TAG, currentUser.getDisplayName());
             Log.d(TAG, currentUser.getUid());
             Log.d(TAG, "User already logged in, returning to mainActivity");
-            finish();
+//            finish();
         } else {
             Log.d(TAG, "Firebase user is not authenticated");
         }
@@ -84,7 +82,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         Log.d(TAG, "New user written to FB");
     }
 
-    private void returnUserData(){
+    private void returnUserData() {
 
     }
 
