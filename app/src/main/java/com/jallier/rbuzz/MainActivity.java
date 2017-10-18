@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case (LOGIN_ACTIVITY_CODE):
                 if (resultCode == Activity.RESULT_OK) {
-                    Log.d(TAG, data.getStringExtra("displayName"));
+                    Log.d(TAG, data.getParcelableExtra("googleAcct").toString());
                 }
         }
     }

@@ -25,6 +25,15 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+
+import java.util.Queue;
+import java.util.Stack;
 
 /**
  * A login screen that offers login via email/password.
@@ -33,15 +42,46 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private final static String TAG = "LoginActivity";
     private static int RC_SIGN_IN = 100;
     private FirebaseAuth mAuth;
+    private DatabaseReference mDatabase;
+    private DatabaseReference mUsersReference;
+    private ValueEventListener mListener;
 
     @Override
     protected void onStart() {
         super.onStart();
+        //Firebase DB nonsense
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mUsersReference = mDatabase.child("users");
+        ValueEventListener listener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d(TAG, dataSnapshot.getValue().toString());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        mUsersReference.addValueEventListener(listener);
+        mListener = listener;
+
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null) {
             Log.d(TAG, currentUser.getDisplayName());
             Log.d(TAG, currentUser.getUid());
+            Log.d(TAG, "User already logged in, returning to mainActivity");
+            finish();
+        } else {
+            Log.d(TAG, "Firebase user is not authenticated");
         }
+    }
+
+    private void writeNewUser(String uuid, String name, String fcmToken) {
+        User user = new User(name, fcmToken);
+
+        mUsersReference.child(uuid).setValue(user);
+        Log.d(TAG, "New user written to FB");
     }
 
     private void returnUserData(){
@@ -60,6 +100,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
+                            String token = FirebaseInstanceId.getInstance().getToken();
+                            writeNewUser(user.getUid(), user.getDisplayName(), token);
 //                            updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
@@ -132,12 +174,9 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
             // Send the info back to the parent activity
             Intent resultIntent = new Intent();
-            resultIntent.putExtra("displayName", acct.getDisplayName());
-            resultIntent.putExtra("email", acct.getEmail());
-            resultIntent.putExtra("id", acct.getId());
-            resultIntent.putExtra("idToken", acct.getIdToken());
+            resultIntent.putExtra("googleAcct", acct);
             setResult(Activity.RESULT_OK, resultIntent);
-            finish();
+//            finish();
         }
     }
 
