@@ -70,8 +70,10 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Log.v(TAG, "Play button clicked. Pattern: " + pattern.toString());
                 String uid = currentFirebaseUser.getUid();
-                Message message = new Message(uid, pattern);
-                mDatabase.child("messages").child(uid).setValue(message); // child(uid) should change to the recipient later
+                Message message = new Message(uid, uid, pattern); // The recipient will change once contacts are added
+//                mDatabase.child("messages").child(uid).setValue(message);
+                mDatabase.child("messages").push().setValue(message);
+                Log.d(TAG, "Added message to FB queue");
 //                playVibration(pattern);
                 resetPatternAndVars(pattern, initialBtnPush);
             }

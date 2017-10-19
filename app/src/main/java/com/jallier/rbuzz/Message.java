@@ -8,12 +8,14 @@ import java.util.List;
 
 public class Message {
     public String sender;
+    public String recipient;
     public List<Long> pattern;
 
     public Message(){}
 
-    public Message(String sender, List<Long> pattern) {
+    public Message(String sender, String recipient, List<Long> pattern) {
         this.sender = sender;
+        this.recipient = recipient;
         this.pattern = pattern;
     }
 }
