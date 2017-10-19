@@ -3,23 +3,32 @@ package com.jallier.rbuzz;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private final long TIME_WINDOW = 5000; // ms for how long to check times between btn pushes
     private final int LOGIN_ACTIVITY_CODE = 101;
+    private DatabaseReference mDatabase;
+    private Vibrator vibrator;
+    private FirebaseAuth mAuth;
+    private FirebaseUser currentFirebaseUser;
 
     @Override
     protected void onStart() {
@@ -33,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         final Button btnLoginActiv = (Button) findViewById(R.id.btnLoginActiv);
         btnLoginActiv.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -44,10 +52,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Get vibration api class
-        final Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
-        final ArrayList<Long> pattern = new ArrayList<>();
+        //Get reference to Firebase DB and Auth
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mAuth = FirebaseAuth.getInstance();
+        currentFirebaseUser = mAuth.getCurrentUser();
+
+
+        final List<Long> pattern = new ArrayList<>();
         pattern.add((long) 0); // First value in array represents delay before first buzz, so set to 0
         final SimpleBool initialBtnPush = new SimpleBool(true);
 
@@ -56,11 +69,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.v(TAG, "Play button clicked. Pattern: " + pattern.toString());
-                long[] pt = new long[pattern.size()];
-                for (int i = 0; i < pattern.size(); i++) {
-                    pt[i] = pattern.get(i);
-                }
-                vibrator.vibrate(pt, -1);
+                String uid = currentFirebaseUser.getUid();
+                Message message = new Message(uid, pattern);
+                mDatabase.child("messages").child(uid).setValue(message); // child(uid) should change to the recipient later
+//                playVibration(pattern);
                 resetPatternAndVars(pattern, initialBtnPush);
             }
         });
@@ -106,6 +118,14 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void playVibration(List<Long> pattern) {
+        long[] pt = new long[pattern.size()];
+        for (int i = 0; i < pattern.size(); i++) {
+            pt[i] = pattern.get(i);
+        }
+        vibrator.vibrate(pt, -1);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -117,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void resetPatternAndVars(ArrayList<Long> pattern, SimpleBool initialBtnPush) {
+    private void resetPatternAndVars(List<Long> pattern, SimpleBool initialBtnPush) {
         pattern.clear();
         pattern.add((long) 0);
         initialBtnPush.setBool(true);
