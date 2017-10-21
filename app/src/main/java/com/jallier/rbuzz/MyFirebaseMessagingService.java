@@ -1,5 +1,7 @@
 package com.jallier.rbuzz;
 
+import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -18,11 +20,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         // TODO(developer): Handle FCM messages here.
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
-        Log.d(TAG, "From: " + remoteMessage.getFrom());
 
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
-            Log.d(TAG, "Message data payload: " + remoteMessage.getData());
+            handleDataNotification(remoteMessage);
         }
 
         // Check if message contains a notification payload.
@@ -32,5 +33,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         // Also if you intend on generating your own notifications as a result of a received FCM
         // message, here is where that should be initiated. See sendNotification method below.
+    }
+
+    private void handleDataNotification(RemoteMessage remoteMessage) {
+        Log.d(TAG, "Message data payload: " + remoteMessage.getData());
+        Intent intent = new Intent("notif");
+        intent.putExtra("message", remoteMessage);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 }
