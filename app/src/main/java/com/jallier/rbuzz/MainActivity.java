@@ -28,7 +28,6 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseReference mDatabase;
     private Vibrator vibrator;
     private FirebaseAuth mAuth;
-    private FirebaseUser currentFirebaseUser;
 
     @Override
     protected void onStart() {
@@ -57,8 +56,6 @@ public class MainActivity extends AppCompatActivity {
         //Get reference to Firebase DB and Auth
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
-        currentFirebaseUser = mAuth.getCurrentUser();
-
 
         final List<Long> pattern = new ArrayList<>();
         pattern.add((long) 0); // First value in array represents delay before first buzz, so set to 0
@@ -69,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.v(TAG, "Play button clicked. Pattern: " + pattern.toString());
-                String uid = currentFirebaseUser.getUid();
+                String uid = mAuth.getCurrentUser().getUid();
                 Message message = new Message(uid, uid, pattern); // The recipient will change once contacts are added
 //                mDatabase.child("messages").child(uid).setValue(message);
                 mDatabase.child("messages").push().setValue(message);
