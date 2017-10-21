@@ -25,8 +25,6 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
@@ -43,47 +41,11 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private DatabaseReference mUsersReference;
     private ValueEventListener mListener;
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        //Firebase DB nonsense
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        mUsersReference = mDatabase.child("users").child(mAuth.getCurrentUser().getUid());
-        ValueEventListener listener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d(TAG, dataSnapshot.getValue().toString());
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.d(TAG, "Firebase connection error: " + databaseError.getDetails() + " " + databaseError.getMessage());
-            }
-        };
-//        mUsersReference.addValueEventListener(listener);
-        mUsersReference.addListenerForSingleValueEvent(listener);
-        mListener = listener;
-
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null) {
-            Log.d(TAG, currentUser.getDisplayName());
-            Log.d(TAG, currentUser.getUid());
-            Log.d(TAG, "User already logged in, returning to mainActivity");
-//            finish();
-        } else {
-            Log.d(TAG, "Firebase user is not authenticated");
-        }
-    }
-
     private void writeNewUser(String uuid, String name, String fcmToken) {
         User user = new User(name, fcmToken);
 
         mUsersReference.child(uuid).setValue(user);
         Log.d(TAG, "New user written to FB");
-    }
-
-    private void returnUserData() {
-
     }
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
@@ -97,6 +59,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
+                            mDatabase = FirebaseDatabase.getInstance().getReference();
+                            mUsersReference = mDatabase.child("users").child(mAuth.getCurrentUser().getUid());
                             FirebaseUser user = mAuth.getCurrentUser();
                             String token = FirebaseInstanceId.getInstance().getToken();
                             writeNewUser(user.getUid(), user.getDisplayName(), token);
@@ -142,6 +106,16 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 startActivityForResult(intent, RC_SIGN_IN);
             }
         });
+
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            Log.d(TAG, currentUser.getDisplayName());
+            Log.d(TAG, currentUser.getUid());
+            Log.d(TAG, "User already logged in, returning to mainActivity");
+//            finish();
+        } else {
+            Log.d(TAG, "Firebase user is not authenticated");
+        }
 
     }
 
