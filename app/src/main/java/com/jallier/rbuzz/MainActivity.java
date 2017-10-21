@@ -1,10 +1,13 @@
 package com.jallier.rbuzz;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -12,10 +15,10 @@ import android.view.View;
 import android.widget.Button;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +31,19 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseReference mDatabase;
     private Vibrator vibrator;
     private FirebaseAuth mAuth;
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            RemoteMessage message = intent.getParcelableExtra("message");
+            Log.d(TAG, "Received notif; playing pattern: " + message.getData().get("pattern"));
+            String[] patternString = message.getData().get("pattern").split("\\[|\\]|,");
+            List<Long> pattern = new ArrayList<>();
+            for (int i = 1; i < patternString.length; i++) {
+                pattern.add(Long.parseLong(patternString[i]));
+            }
+            playVibration(pattern);
+        }
+    };
 
     @Override
     protected void onStart() {
@@ -115,6 +131,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "Pattern cleared");
             }
         });
+        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, new IntentFilter("notif"));
     }
 
     private void playVibration(List<Long> pattern) {
