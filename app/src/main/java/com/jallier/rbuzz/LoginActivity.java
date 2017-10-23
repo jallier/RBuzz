@@ -41,8 +41,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private DatabaseReference mUsersReference;
     private ValueEventListener mListener;
 
-    private void writeNewUser(String uuid, String name, String fcmToken) {
-        User user = new User(name, fcmToken);
+    private void writeNewUser(String uuid, String name, String email, String fcmToken) {
+        User user = new User(name, email, fcmToken);
 
         mUsersReference.child(uuid).setValue(user);
         Log.d(TAG, "New user written to FB");
@@ -63,7 +63,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                             mUsersReference = mDatabase.child("users");
                             FirebaseUser user = mAuth.getCurrentUser();
                             String token = FirebaseInstanceId.getInstance().getToken();
-                            writeNewUser(user.getUid(), user.getDisplayName(), token);
+                            writeNewUser(user.getUid(), user.getDisplayName(), user.getEmail(), token);
 //                            updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.

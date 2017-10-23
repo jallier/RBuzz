@@ -5,6 +5,7 @@
     <string name="btnReset">Reset pattern</string>
     <string name="btnLoginActiv">Login Activity</string>
     <string name="title_activity_login">Sign in</string>
+    <string name="btnAddContact">Add Contact</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>

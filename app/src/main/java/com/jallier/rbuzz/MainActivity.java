@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -35,13 +36,19 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             RemoteMessage message = intent.getParcelableExtra("message");
-            Log.d(TAG, "Received notif; playing pattern: " + message.getData().get("pattern"));
-            String[] patternString = message.getData().get("pattern").split("\\[|\\]|,");
-            List<Long> pattern = new ArrayList<>();
-            for (int i = 1; i < patternString.length; i++) {
-                pattern.add(Long.parseLong(patternString[i]));
+            String messageType = message.getData().get("messageType");
+            switch (messageType) {
+                case "vibration":
+                    String[] patternString = message.getData().get("pattern").split("\\[|\\]|,");
+                    List<Long> pattern = new ArrayList<>();
+                    for (int i = 1; i < patternString.length; i++) {
+                        pattern.add(Long.parseLong(patternString[i]));
+                    }
+                    Log.d(TAG, "Received notif; playing pattern: " + pattern);
+                    playVibration(pattern);
+                case "contactRequest":
+                    Log.d(TAG, ""+message.getData());
             }
-            playVibration(pattern);
         }
     };
 
@@ -118,6 +125,20 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "record released. Length: " + elapsed);
                 }
                 return true;
+            }
+        });
+
+        final Button btnAddContact = (Button) findViewById(R.id.btnAddContact);
+        btnAddContact.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "Add contact button pushed");
+                String uid = mAuth.getCurrentUser().getUid();
+                EditText editText = (EditText) findViewById(R.id.editTextAddContact);
+                String recipient = editText.getText().toString();
+                ContactRequest request = new ContactRequest(uid, recipient);
+                mDatabase.child("contactRequests").push().setValue(request);
+                Log.d(TAG, "Added contact request to FB queue");
             }
         });
 

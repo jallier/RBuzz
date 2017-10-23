@@ -7,11 +7,13 @@ package com.jallier.rbuzz;
 public class User {
     public String name;
     public String fcmToken;
+    public String email;
 
     public User(){}
 
-    public User(String name, String fcmToken) {
+    public User(String name, String email, String fcmToken) {
         this.name = name;
         this.fcmToken = fcmToken;
+        this.email = email;
     }
 }
