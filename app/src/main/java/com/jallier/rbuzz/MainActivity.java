@@ -46,8 +46,10 @@ public class MainActivity extends AppCompatActivity {
                     }
                     Log.d(TAG, "Received notif; playing pattern: " + pattern);
                     playVibration(pattern);
+                    break;
                 case "contactRequest":
                     Log.d(TAG, ""+message.getData());
+                    break;
             }
         }
     };
