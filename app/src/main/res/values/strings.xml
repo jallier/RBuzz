@@ -6,6 +6,10 @@
     <string name="btnLoginActiv">Login Activity</string>
     <string name="title_activity_login">Sign in</string>
     <string name="btnAddContact">Add Contact</string>
+    <string name="dialogAcceptContactRequestTitle">Accept Contact Request?</string>
+    <string name="dialogYes">Yes</string>
+    <string name="dialogNo">No</string>
+    <string name="dialogAcceptContactRequestMessage">has sent you a contact request. Would you like to accept?</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>

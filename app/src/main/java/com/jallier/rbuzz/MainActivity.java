@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -25,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AcceptContactRequestDialogFragment.PositiveContactRequestListener {
     private static final String TAG = "MainActivity";
     private final long TIME_WINDOW = 5000; // ms for how long to check times between btn pushes
     private final int LOGIN_ACTIVITY_CODE = 101;
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "received message from server");
             RemoteMessage message = intent.getParcelableExtra("message");
             String messageType = message.getData().get("messageType");
             switch (messageType) {
@@ -48,7 +50,12 @@ public class MainActivity extends AppCompatActivity {
                     playVibration(pattern);
                     break;
                 case "contactRequest":
-                    Log.d(TAG, ""+message.getData());
+                    Log.d(TAG, "Contact request: " + message.getData());
+                    DialogFragment fragment = new AcceptContactRequestDialogFragment();
+                    Bundle args = new Bundle();
+                    args.putString("sender", message.getData().get("sender"));
+                    fragment.setArguments(args);
+                    fragment.show(getSupportFragmentManager(), "contact");
                     break;
             }
         }
@@ -180,6 +187,11 @@ public class MainActivity extends AppCompatActivity {
         pattern.clear();
         pattern.add((long) 0);
         initialBtnPush.setBool(true);
+    }
+
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+        Log.d(TAG, "Positive button pushed");
     }
 
     private class SimpleBool {
