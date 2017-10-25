@@ -31,13 +31,13 @@ public class AcceptContactRequestDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Bundle args = getArguments();
-        String sender = args.getString("sender");
-        sender = sender + " " + getString(R.string.dialogAcceptContactRequestMessage);
+        final String sender = args.getString("sender");
+        String formattedSender = sender + " " + getString(R.string.dialogAcceptContactRequestMessage);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setMessage(R.string.dialogAcceptContactRequestTitle).setMessage(sender).setPositiveButton(R.string.dialogYes, new DialogInterface.OnClickListener() {
+        builder.setMessage(R.string.dialogAcceptContactRequestTitle).setMessage(formattedSender).setPositiveButton(R.string.dialogYes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                pListener.onDialogPositiveClick(AcceptContactRequestDialogFragment.this);
+                pListener.onDialogPositiveClick(AcceptContactRequestDialogFragment.this, sender);
             }
         }).setNegativeButton(R.string.dialogNo, new DialogInterface.OnClickListener() {
             @Override
@@ -49,6 +49,6 @@ public class AcceptContactRequestDialogFragment extends DialogFragment {
     }
 
     interface PositiveContactRequestListener {
-        void onDialogPositiveClick(DialogFragment dialog);
+        void onDialogPositiveClick(DialogFragment dialog, String recipient);
     }
 }

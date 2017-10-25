@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements AcceptContactRequ
                 String uid = mAuth.getCurrentUser().getUid();
                 EditText editText = (EditText) findViewById(R.id.editTextAddContact);
                 String recipient = editText.getText().toString();
-                ContactRequest request = new ContactRequest(uid, recipient);
+                ContactRequest request = new ContactRequest("contactRequest", uid, recipient);
                 mDatabase.child("contactRequests").push().setValue(request);
                 Log.d(TAG, "Added contact request to FB queue");
             }
@@ -189,9 +189,16 @@ public class MainActivity extends AppCompatActivity implements AcceptContactRequ
         initialBtnPush.setBool(true);
     }
 
+    /**
+     * Handle the result from clicking 'yes' in the contact request confirmation dialog
+     * @param dialog The dialog fragment that generated the event
+     */
     @Override
-    public void onDialogPositiveClick(DialogFragment dialog) {
-        Log.d(TAG, "Positive button pushed");
+    public void onDialogPositiveClick(DialogFragment dialog, String recipient) {
+        Log.d(TAG, "Positive button pushed, accepting request from user: " + recipient);
+        String currentId = mAuth.getCurrentUser().getUid();
+        ContactRequest request = new ContactRequest("contactAccept", currentId, recipient);
+        mDatabase.child("contactRequests").push().setValue(request);
     }
 
     private class SimpleBool {
