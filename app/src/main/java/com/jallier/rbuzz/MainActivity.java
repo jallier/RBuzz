@@ -33,6 +33,8 @@ public class MainActivity extends AppCompatActivity implements AcceptContactRequ
     private DatabaseReference mDatabase;
     private Vibrator vibrator;
     private FirebaseAuth mAuth;
+
+    // Broadcast receiver to handle the notification service passing data back to Main Activity
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -78,7 +80,6 @@ public class MainActivity extends AppCompatActivity implements AcceptContactRequ
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-//                startActivity(intent);
                 startActivityForResult(intent, LOGIN_ACTIVITY_CODE);
             }
         });
@@ -95,15 +96,17 @@ public class MainActivity extends AppCompatActivity implements AcceptContactRequ
 
         final Button btnPlayBuzz = (Button) findViewById(R.id.btnPlayBuzz);
         btnPlayBuzz.setOnClickListener(new View.OnClickListener() {
+            /**
+             * When the play button is pushed, write the vibration pattern to the Firebase db under /messages
+             * @param v Calling view
+             */
             @Override
             public void onClick(View v) {
                 Log.v(TAG, "Play button clicked. Pattern: " + pattern.toString());
                 String uid = mAuth.getCurrentUser().getUid();
                 Message message = new Message(uid, uid, pattern); // The recipient will change once contacts are added
-//                mDatabase.child("messages").child(uid).setValue(message);
                 mDatabase.child("messages").push().setValue(message);
                 Log.d(TAG, "Added message to FB queue");
-//                playVibration(pattern);
                 resetPatternAndVars(pattern, initialBtnPush);
             }
         });
@@ -164,6 +167,10 @@ public class MainActivity extends AppCompatActivity implements AcceptContactRequ
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, new IntentFilter("notif"));
     }
 
+    /**
+     *
+     * @param pattern List representing the pattern of vibrations to play.
+     */
     private void playVibration(List<Long> pattern) {
         long[] pt = new long[pattern.size()];
         for (int i = 0; i < pattern.size(); i++) {
@@ -172,6 +179,12 @@ public class MainActivity extends AppCompatActivity implements AcceptContactRequ
         vibrator.vibrate(pt, -1);
     }
 
+    /**
+     * Method to handle the result of the login activity
+     * @param requestCode code passed in on new activity creation
+     * @param resultCode code returned from activity
+     * @param data result from the login activity
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -183,6 +196,11 @@ public class MainActivity extends AppCompatActivity implements AcceptContactRequ
         }
     }
 
+    /**
+     * Reset the current pattern to record the next one. Adds the initial 0 value which represents initial delay.
+     * @param pattern
+     * @param initialBtnPush
+     */
     private void resetPatternAndVars(List<Long> pattern, SimpleBool initialBtnPush) {
         pattern.clear();
         pattern.add((long) 0);
