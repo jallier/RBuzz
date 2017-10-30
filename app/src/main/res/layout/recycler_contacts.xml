@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:id="@+id/gmailItemLetter"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:adjustViewBounds="false"
+        android:contentDescription="@string/contactLetterDesc" />
 
     <TextView
         android:id="@+id/rvName"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="text"
+        android:paddingLeft="5dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
-</RelativeLayout>
+</LinearLayout>

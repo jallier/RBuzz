@@ -15,6 +15,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -183,6 +184,9 @@ public class MainActivity extends AppCompatActivity implements AcceptContactRequ
         mAdapter = new ContactsAdapter(contactsList);
         mRecyclerView.setAdapter(mAdapter);
         populateRecycler(contactsList);
+
+        // Stop the keyboard from appearing. REMOVE WHEN ADD CONTACT IN OWN ACTIVITY
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
     }
 
     /**
