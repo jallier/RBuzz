@@ -10,6 +10,8 @@ import android.os.Vibrator;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -33,6 +35,10 @@ public class MainActivity extends AppCompatActivity implements AcceptContactRequ
     private DatabaseReference mDatabase;
     private Vibrator vibrator;
     private FirebaseAuth mAuth;
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+    private List<Contact> contactsList = new ArrayList<>();
 
     // Broadcast receiver to handle the notification service passing data back to Main Activity
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -164,7 +170,17 @@ public class MainActivity extends AppCompatActivity implements AcceptContactRequ
                 Log.d(TAG, "Pattern cleared");
             }
         });
+
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, new IntentFilter("notif"));
+
+        mRecyclerView = (RecyclerView) findViewById(R.id.contactsRV);
+        mRecyclerView.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mAdapter = new ContactsAdapter(contactsList);
+        mRecyclerView.setAdapter(mAdapter);
+        contactsList.add(new Contact("Test One"));
+        contactsList.add(new Contact("Test Two"));
     }
 
     /**
