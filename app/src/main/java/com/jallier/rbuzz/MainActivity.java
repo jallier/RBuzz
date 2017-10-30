@@ -19,8 +19,11 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -179,12 +182,35 @@ public class MainActivity extends AppCompatActivity implements AcceptContactRequ
         mRecyclerView.setLayoutManager(mLayoutManager);
         mAdapter = new ContactsAdapter(contactsList);
         mRecyclerView.setAdapter(mAdapter);
-        contactsList.add(new Contact("Test One"));
-        contactsList.add(new Contact("Test Two"));
+        populateRecycler(contactsList);
     }
 
     /**
+     * Fetch the users contacts from firebase and add them to the list attached to the recyclerview adapter
      *
+     * @param contacts the list to add the contacts to.
+     */
+    private void populateRecycler(final List<Contact> contacts) {
+        ValueEventListener contactsListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d(TAG, "retrieved users contacts from database");
+                Iterable<DataSnapshot> dataSnapshots = dataSnapshot.child("contacts").getChildren();
+                for (DataSnapshot i : dataSnapshots) {
+                    contacts.add(new Contact(i.getValue().toString()));
+                }
+                mAdapter.notifyItemInserted(contacts.size() - 1);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.w(TAG, "Reading contacts failed: " + databaseError);
+            }
+        };
+        mDatabase.child("users/" + mAuth.getCurrentUser().getUid()).addListenerForSingleValueEvent(contactsListener);
+    }
+
+    /**
      * @param pattern List representing the pattern of vibrations to play.
      */
     private void playVibration(List<Long> pattern) {
@@ -197,9 +223,10 @@ public class MainActivity extends AppCompatActivity implements AcceptContactRequ
 
     /**
      * Method to handle the result of the login activity
+     *
      * @param requestCode code passed in on new activity creation
-     * @param resultCode code returned from activity
-     * @param data result from the login activity
+     * @param resultCode  code returned from activity
+     * @param data        result from the login activity
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -214,6 +241,7 @@ public class MainActivity extends AppCompatActivity implements AcceptContactRequ
 
     /**
      * Reset the current pattern to record the next one. Adds the initial 0 value which represents initial delay.
+     *
      * @param pattern
      * @param initialBtnPush
      */
@@ -225,6 +253,7 @@ public class MainActivity extends AppCompatActivity implements AcceptContactRequ
 
     /**
      * Handle the result from clicking 'yes' in the contact request confirmation dialog
+     *
      * @param dialog The dialog fragment that generated the event
      */
     @Override
