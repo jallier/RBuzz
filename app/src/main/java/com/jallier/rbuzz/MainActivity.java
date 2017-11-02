@@ -183,7 +183,29 @@ public class MainActivity extends AppCompatActivity implements AcceptContactRequ
         mRecyclerView.setLayoutManager(mLayoutManager);
         mAdapter = new ContactsAdapter(contactsList);
         mRecyclerView.setAdapter(mAdapter);
-        populateRecycler(contactsList);
+//        populateRecycler(contactsList);
+
+        ValueEventListener contactsListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d(TAG, "Data changed"+ dataSnapshot.toString());
+                populateRecycler(contactsList);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e(TAG, "Error fetching contacts " + databaseError);
+            }
+        };
+        // TODO: Check that this doesn't break the app completely when it first loads without a user being signed in.
+        String user;
+        try {
+            user = mAuth.getCurrentUser().getUid();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            return;
+        }
+        mDatabase.child("users/" + user + "/contacts").addValueEventListener(contactsListener);
 
         // Stop the keyboard from appearing. REMOVE WHEN ADD CONTACT IN OWN ACTIVITY
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
@@ -199,11 +221,16 @@ public class MainActivity extends AppCompatActivity implements AcceptContactRequ
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Log.d(TAG, "retrieved users contacts from database");
+                contacts.clear();
                 Iterable<DataSnapshot> dataSnapshots = dataSnapshot.child("contacts").getChildren();
                 for (DataSnapshot i : dataSnapshots) {
                     contacts.add(new Contact(i.getValue().toString()));
                 }
-                mAdapter.notifyItemInserted(contacts.size() - 1);
+                if (contacts.size()-1 < 1) {
+                    mAdapter.notifyDataSetChanged();
+                } else {
+                    mAdapter.notifyItemInserted(contacts.size() - 1);
+                }
             }
 
             @Override
@@ -211,7 +238,15 @@ public class MainActivity extends AppCompatActivity implements AcceptContactRequ
                 Log.w(TAG, "Reading contacts failed: " + databaseError);
             }
         };
-        mDatabase.child("users/" + mAuth.getCurrentUser().getUid()).addListenerForSingleValueEvent(contactsListener);
+        // TODO: Check that this doesn't break the app completely when it first loads without a user being signed in.
+        String user;
+        try {
+            user = mAuth.getCurrentUser().getUid();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+        mDatabase.child("users/" + user).addListenerForSingleValueEvent(contactsListener);
     }
 
     /**
